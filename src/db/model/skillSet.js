@@ -8,7 +8,7 @@ module.exports = (Sequelize, sequelize) => {
     },
 
     skilset: {//스킬셋
-      type: Sequelize.string(20),
+      type: Sequelize.STRING(20),
       allowNull: false
     }
 
