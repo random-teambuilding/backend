@@ -9,11 +9,13 @@ module.exports = (Sequelize, sequelize) => {
 
     name: {//이름(닉네임)
       type: Sequelize.STRING(30),
+      unique: true,
       allowNull: false
     },
 
     email: {//이메일 주소
       type: Sequelize.STRING(30),
+      unique: true,
       allowNull: false
     },
 
