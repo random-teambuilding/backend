@@ -174,7 +174,29 @@ exports.emailVerificationSend = (async (ctx,next) => {// R
 });
 
 exports.emailVerificationCheck = (async (ctx,next) => {// X
+  cosnt { id } = ctx.params;
+  cosnt { code } = ctx.params;
   let status,body,sql,sqlParams;
+
+  client.get(code, async (err, value) => {
+    if(err) throw err;
+    if(value == id){
+      sql = `UPDATE user SET cert = 1 WHERE id = '?';`;
+      sqlParams = [id];
+      await connection.query(sql, sqlParams,(err, rows) =>{
+        status = 201;
+        body = {};
+        connection.release();
+      });
+    }else{
+      status = 403;
+      body = {
+        errorMessage : "invalid_account",
+        errorCode : "E106",
+        errorDescription : "인증 코드가 일치하지 않음"
+      };
+    }
+  });
 
   ctx.status = status;
   ctx.body = body;
