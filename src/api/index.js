@@ -14,7 +14,7 @@ api.GET( '/api/duplicate', apiCtrl.duplicateCheck); //duplicateCheckAPI
 api.POST( '/api/verification', apiCtrl.emailVerificationSend); //emailVerificationAPI
 api.GET( '/api/verification', apiCtrl.emailVerificationCheck); //emailVerificationAPI
 api.POST( '/api/login', apiCtrl.login); //loginAPI
-api.POST( '/api/refresh', apiCtrl.refreshAccesToken); //refresh accestokenAPI
+api.POST( '/api/token', apiCtrl.refreshAccessToken); //refresh AccessTokennAPI
 
 
 
