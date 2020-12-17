@@ -16,9 +16,9 @@ exports.signAccessToken = (async (name) => {
 //리프레시 토큰을 생성해 줍니다.
 exports.signRefreshToken = (async (name, pin) => {
   const refreshToken = await jwt.sign({ pin: crypto.HmacSHA256(num + pin, process.env.sha256SecretKey) },process.env.jwtSecretKey,{expiresIn: '2w'});
-  await client.set(name, refreshToken);
   return refreshToken;
 });
+
 
 //엑세스 토큰을 인증해 줍니다.
 exports.verifyAccessToken = (async (token) => {
@@ -27,21 +27,26 @@ exports.verifyAccessToken = (async (token) => {
     if(error){ 
       console.log(error);
       check = ''; 
-    }
-    else{
+    }else{
       check = decoded['name'];
     }
   });
   return check;
 });
 
+//엑세스 토큰의 페이로드를 응답해 줍니다.
+exports.accessTokenPayload = (async (token) => {
+  let tokenPayload = jwt.decode(token, {complete: true}).payload['name'];;
+  return tokenPayload;
+});
+
 //리프레시 토큰을 인증해 줍니다.
 exports.verifyRefreshToken = (async (token) => {
-  let check;
+  let check, tokenPayload;
   jwt.verify(token, process.env.jwtSecretKey, (error, decoded) => {
-    if(error){ 
+    if(error){
       console.log(error);
-      check = ''; 
+      check = '';
     }
     else{
       check = decoded['pin'];
