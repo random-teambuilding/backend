@@ -5,6 +5,7 @@ dotenv.config();
 
 import token from '../lib/token';//token 사용 모듈
 import pin from '../lib/pin';//pin 사용 모듈
+import mail from '../lib/email';//mail 사용 모듈
 
 const client = redis.createClient();
 const connection = mariadb.createPool({//db 연결용 변수, 내부 변수는 환경변수로 설정.
@@ -128,9 +129,46 @@ exports.duplicateCheck = (async (ctx,next) => {// R
   ctx.body = body;
 });
 
-exports.emailVerificationSend = (async (ctx,next) => {// X
-  let status,body,sql,sqlParams;
+exports.emailVerificationSend = (async (ctx,next) => {// R
+  const { id } = ctx.request.body;
+  let status,body,sql,sqlParams,check = 1;
+  let pin = await pin.makePin(5);
 
+  while (check) {
+    client.get(pin, async (err, value) => {
+      if(err) throw err;
+      if(value != ''){
+        pin = await pin.makePin(5);
+        console.log(`pin = ${pin}`);
+      }else{
+        check = 0;
+      }
+    });
+  }
+
+  sql = `SELECT id FROM user WHERE id = '?';`;
+  sqlParams = [id];
+  await connection.query(sql, sqlParams,(err, rows) =>{
+    if (err) {
+      console.log(err);
+    }
+    if(rows[0] == undefined){
+      await mail.sendMail(id, '이메일 인증 코드입니다.', pin);
+      await client.set(pin, id);
+      status = 201;
+      body = {};
+    }else{
+      status = 403;
+      body = {
+        errorMessage : "invalid_account",
+        errorCode : "E102",
+        errorDescription : "이미 존재하는 계정"
+      };
+    }
+
+    connection.release();
+  });
+  
   ctx.status = status;
   ctx.body = body;
 });
