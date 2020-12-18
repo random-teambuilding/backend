@@ -134,17 +134,6 @@ exports.emailVerificationSend = (async (ctx,next) => {// R
   let status,body,sql,sqlParams,check = 1;
   let pin = await pin.makePin(5);
 
-  while (check) {
-    client.get(pin, async (err, value) => {
-      if(err) throw err;
-      if(value != ''){
-        pin = await pin.makePin(5);
-        console.log(`pin = ${pin}`);
-      }else{
-        check = 0;
-      }
-    });
-  }
 
   sql = `SELECT id FROM user WHERE id = '?';`;
   sqlParams = [id];
@@ -154,7 +143,7 @@ exports.emailVerificationSend = (async (ctx,next) => {// R
     }
     if(rows[0] == undefined){
       await mail.sendMail(id, '이메일 인증 코드입니다.', pin);
-      await client.set(pin, id);
+      await client.set(id, pin);
       status = 201;
       body = {};
     }else{
@@ -173,14 +162,14 @@ exports.emailVerificationSend = (async (ctx,next) => {// R
   ctx.body = body;
 });
 
-exports.emailVerificationCheck = (async (ctx,next) => {// X
+exports.emailVerificationCheck = (async (ctx,next) => {// R
   cosnt { id } = ctx.params;
   cosnt { code } = ctx.params;
   let status,body,sql,sqlParams;
 
-  client.get(code, async (err, value) => {
+  client.get(id, async (err, value) => {
     if(err) throw err;
-    if(value == id){
+    if(value == code){
       sql = `UPDATE user SET cert = 1 WHERE id = '?';`;
       sqlParams = [id];
       await connection.query(sql, sqlParams,(err, rows) =>{
