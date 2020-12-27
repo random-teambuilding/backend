@@ -192,6 +192,17 @@ exports.emailVerificationCheck = (async (ctx,next) => {// R
 });
 
 exports.signup = (async (ctx,next) => {// X
+  const { id } = ctx.request.body;
+  const { password } = ctx.request.body;
+  const { name } = ctx.request.body;
+  const { description } = ctx.request.body;
+  const { positon1 } = ctx.request.body;
+  const { positon2 } = ctx.request.body;
+  const { skill } = ctx.request.body;
+  const { subject } = ctx.request.body;
+  const { locate1 } = ctx.request.body;
+  const { locate2 } = ctx.request.body;
+  const { locate3 } = ctx.request.body;
   let status,body,sql,sqlParams;
 
   ctx.status = status;
